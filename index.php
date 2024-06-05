@@ -40,11 +40,15 @@ $section = 1;
             </a>
             <p class="credit text-xs">
                 Posted in <a class="text-pink-400" href="category.php?id=<?= $article['category_id'] ?>">
-                    <?= e($article['category']) ?></a>
-                by <a class="text-pink-400" href="user.php?id=<?= $article['user_id'] ?>">
-                    <?= e($article['author']) ?></a>
+            <?= e( $article['category'] ) ?></a>
+            by <a class="text-pink-400" href="user.php?id=<?= $article['user_id'] ?>">
+        <?= e($article['author'] ) ?></a>
             </p>
         </article>
     <?php endforeach; ?>
 </main>
 <?php include './includes/footer.php'; ?>
+
+
+
+
