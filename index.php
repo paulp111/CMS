@@ -18,16 +18,17 @@ LIMIT 6;";
 
 $articles = pdo_execute($pdo, $sql)->fetchAll(PDO::FETCH_ASSOC);
 
-// SQL Abfrage um alle Kategorien zu erhalten
+// Kategorien für die Navigation
 $sql = "SELECT id, name FROM category WHERE navigation = 1;";
-
 $navigation = pdo_execute($pdo, $sql)->fetchAll();
 
+// Variablen für die Header-Ausgabe
 $title = 'IT-News';
 $description = 'All about IT and News from Software Development and Hardware';
-$section = 1;
-
+$section = '';
+//var_dump( $articles);
 ?>
+
 <?php include './includes/header.php'; ?>
 <main class="flex flex-wrap p-8" id="content">
     <?php foreach($articles as $article) :?>
