@@ -16,6 +16,13 @@ $category = [
     'description' => '',
     'navigation' => false
 ];
+$navigation = [
+    ['name' => 'articles', 'id' => ''],
+    ['name' => 'categories', 'id' => '']
+];
+$section = '';
+
+//-------------------------------------------------------------------------
 
 // Wenn eine ID vorhanden ist, dann wird die Kategorie aus der Datenbank geladen
 if ($id) {
@@ -28,27 +35,25 @@ if ($id) {
     }
 }
 
-// Input/Success variablen
-$error = filter_input(INPUT_GET, 'error', FILTER_SANITIZE_STRING) ?? '';
-$success = filter_input(INPUT_GET, 'success', FILTER_SANITIZE_STRING) ?? '';
+//-------------------------------------------------------------------------
 
 // Wenn das Formular mit Daten abgeschickt wurde, dann werden die Daten validiert und gespeichert
-if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Die Daten werden aus dem Formular ausgelesen und validiert
-    $category['name'] = filter_input( INPUT_POST, 'name' );
-    $category['description'] = filter_input( INPUT_POST, 'description' );
-    $category['navigation'] = filter_input( INPUT_POST, 'navigation', FILTER_VALIDATE_BOOLEAN );
+    $category['name'] = filter_input(INPUT_POST, 'name');
+    $category['description'] = filter_input(INPUT_POST, 'description');
+    $category['navigation'] = filter_input(INPUT_POST, 'navigation', FILTER_VALIDATE_BOOLEAN);
     //Die Daten werden auf Länge und vorhaben validiert
-    $errors['name'] = is_text( $category['name'], 1, 50 ) && ( !empty( $category['name'] ) ) ? '' : 'Name must be between 1 and 50 characters';
-    $errors['description'] = is_text( $category['description'], 1, 254 ) && ( ! empty( $category['description'] ) ) ? '' : 'Description must be between 1 and 254 characters' ;
+    $errors['name'] = is_text($category['name'], 1, 50) && (!empty($category['name'])) ? '' : 'Name must be between 1 and 50 characters';
+    $errors['description'] = is_text($category['description'], 1, 254) && (!empty($category['description'])) ? '' : 'Description must be between 1 and 254 characters';
     // Fehler werden in eine Zeichenkette zusammengefasst
-    $problems = implode(array_filter( $errors));
+    $problems = implode(array_filter($errors));
 
     // Wenn es keine Fehler gibt, wird die Kategorie gespeichert und der Benutzer für Kategorie-Liste umgeleitet
-    if ( ! $problems ) {
+    if (!$problems) {
         // Wenn die ID vorhanden ist, wird die Kategorie aktualisiert (UPDATE), ansonsten wird eine neue Kategorie in der Datenbank erstellt
         $sql = "INSERT INTO category (name, description, navigation) VALUES (:name, :description, :navigation)";
-        if ( $id ) {
+        if ($id) {
             $sql = "UPDATE category SET name = :name, description = :description, navigation = :navigation WHERE id = :id";
         }
         // Die zu speichernden Daten werden in ein Array zusammengefasst um später die Platzhalter zu erstezen
@@ -57,35 +62,31 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
             'description' => $category['description'],
             'navigation' => $category['navigation']
         ];
-        if ( $id ) {
+        if ($id) {
             $bindings['id'] = $id;
         }
         // DIe Daten werden in die Datenbank gespeichert und der Benutzer wird zur Kategorie-Liste umgeleitet
         try {
-            pdo_execute( $pdo, $sql, $bindings );
-            redirect( 'categories.php', [ 'success' => 'category successfully saved' ] );
-        } catch ( PDOException $e ) {
-            $errors['issue'] ='There was an issue saving the category';
+            pdo_execute($pdo, $sql, $bindings);
+            redirect('categories.php', ['success' => 'category successfully saved']);
+        } catch (PDOException $e) {
+            $errors['issue'] = 'There was an issue saving the category';
         }
     } else {
         $errors['issue'] = 'Please correct the following issues: ' . $problems;
     }
-} 
-
+}
+//-------------------------------------------------------------------------
 ?>
 
 <?php include '../includes/header-admin.php'; ?>
 <main class="container w-auto mx-auto md:w-1/2 flex justify-center flex-col items-center p-5">
-    <header class="p-10">
-        <h1 class="text-4xl text-blue-500 mb-8"><?= $id ? 'Edit ' : 'New ' ?>Category</h1>
-        <?php if ($error): ?>
-            <p class="error text-red-500 bg-red-200 p-5 rounded-md"><?= $error ?></p>
-        <?php endif; ?>
-        <?php if ($success): ?>
-            <p class="success text-green-500 bg-green-200 p-5 rounded-md"><?= $success ?></p>
-        <?php endif; ?>
-    </header>
     <form class="w-full grid" action="category.php?id=<?= $id ?? '' ?>" method="POST">
+        <h2 class="text-3xl text-blue-500 mb-8"><?= $id ? 'Edit ' : 'New ' ?>Category</h2>
+        <?php if ($errors['issue']): ?>
+            <p class="error text-red-500 bg-red-200 p-5 rounded-md"><?= $errors['issue'] ?></p>
+        <?php endif ?>
+
         <div class="p-4">
             <label class="block mb-2 text-sm font-medium text-gray-900" for="name">Name</label>
             <input
@@ -106,7 +107,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
                 type="checkbox" id="navigation" name="navigation" <?= $category['navigation'] ? 'checked' : '' ?>>
             <label class="ms-2 text-sm font-medium text-gray-900" for="navigation">Navigation</label>
         </div>
-        <button type="submit" class="text-white bg-blue-500 p-3 rounded-md hover:bg-pink-600">Save</button>
+        <button type="submit" class="text-black bg-gray-700 p-3 rounded-md hover:bg-pink-600">Save</button>
     </form>
 </main>
-<?php include '../includes/footer-admin.php'; ?>
+<?php include '../includes/footer-admin.php' ?>
