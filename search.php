@@ -40,10 +40,10 @@ if (!empty($search_term)) {
             'offset' => (int) $offset
         ])->fetchAll(PDO::FETCH_ASSOC);
     }
-    if ($count > $per_page) {
-        $total_pages = ceil($count / $per_page);
-        $current_page = ceil($offset / $per_page) + 1;
-    }
+}
+if ($count > $per_page) {
+    $total_pages = ceil($count / $per_page);
+    $current_page = ceil($offset / $per_page) + 1;
 }
 ?>
 
@@ -78,7 +78,7 @@ if (!empty($search_term)) {
     </section>
 
     <?php if ($count > $per_page): ?>
-        <section class="flex justify-center items-center mt-8">
+        <section class="flex justify-center items-center p-4">
             <nav>
                 <ul class="flex justify-center items-center">
                     <?php if ($current_page > 1): ?>
