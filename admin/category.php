@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 type="checkbox" id="navigation" name="navigation" <?= $category['navigation'] ? 'checked' : '' ?>>
             <label class="ms-2 text-sm font-medium text-gray-900" for="navigation">Navigation</label>
         </div>
-        <button type="submit" class="text-black bg-gray-700 p-3 rounded-md hover:bg-pink-600">Save</button>
+        <button type="submit" class="text-black bg-blue-600 p-3 rounded-md hover:bg-pink-600">Save</button>
     </form>
 </main>
-<?php include '../includes/footer-admin.php' ?>
+<?php include '../includes/footer-admin.php' ?>,
