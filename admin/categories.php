@@ -10,7 +10,7 @@ $navigation = [
     ['name' => 'articles', 'id' => ''],
     ['name' => 'categories', 'id' => '']
 ]
-?>
+    ?>
 
 <?php include '../includes/header-admin.php' ?>
 <main class="container mx-auto flex justify-center flex-col items-center">
