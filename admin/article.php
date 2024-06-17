@@ -3,7 +3,28 @@ require '../includes/validate.php';
 require '../includes/db-connect.php';
 require '../includes/functions.php';
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT) ?? null;
+// Variablen initialisieren für Bildupload
+$path_to_img = '/uploads/';
+$allowed_types = ['image/jpeg', 'image/png'];
+$allowed_text = 1080 * 1920 * 2;
+
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT) ?? '';
+$tmp_path = $_FILES['image_file']['tmp_name'] ?? '';
+$save_to = '';
+
+$article = [
+    'id' => $id,
+    'title' => '',
+    'summary' => '',
+    'content' => '',
+    'published' => false,
+    'category_id' => 0,
+    'user_id' => 0,
+    'images_id' => null,
+    'filename' => '',
+    'alttext' => '',
+];
+
 $errors = [
     'issue' => '',
     'title' => '',
@@ -11,49 +32,63 @@ $errors = [
     'content' => '',
     'category_id' => '',
     'user_id' => '',
+    'filename' => '',
+    'alttext' => '',
 ];
 
-$article = [
-    'id' => '',
-    'title' => '',
-    'summary' => '',
-    'content' => '',
-    'category_id' => '',
-    'user_id' => '',
-    'published' => false,
-    'images_id' => '',
-];
-
-$navigation = [
-    ['name' => 'articles', 'id' => ''],
-    ['name' => 'categories', 'id' => '']
-];
-$section = '';
-
-//-------------------------------------------------------------------------
-
-// Wenn eine ID vorhanden ist, dann wird der Artikel aus der Datenbank geladen
-if ($id) {
-    $sql = "SELECT id, title, summary, content, category_id, user_id, published, images_id FROM articles WHERE id = :id";
-    $article = pdo_execute($pdo, $sql, ['id' => $id])->fetch(PDO::FETCH_ASSOC);
-   
-    // Wenn der Artikel nicht gefunden wird, wird der Benutzer zur Artikelliste umgeleitet und über einen Fehler informiert.
-    if (!$article) {
-        redirect('articles.php', ['error' => 'Article not found']);
-    }
-}
-
-// Kategorien und Benutzer für die Auswahlboxen laden
+// Lade alle Kategorien von der Datenbank
 $sql = "SELECT id, name FROM category";
 $categories = pdo_execute($pdo, $sql)->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT id, CONCAT(forename, ' ', surname) AS name FROM user";
 $users = pdo_execute($pdo, $sql)->fetchAll(PDO::FETCH_ASSOC);
 
+if ($id) {
+    $sql = "SELECT a.id, a.title, a.summary, a.content, a.category_id,
+    a.user_id, a.images_id, a.published,
+    i.filename, i.alttext FROM  articles a
+    LEFT JOIN images i ON a.images_id = i.id
+    WHERE a.id = :id";
+
+    $article = pdo_execute($pdo, $sql, ['id' => $id])->fetch(PDO::FETCH_ASSOC);
+    if (!$article) {
+        redirect('articles.php', ['error' => 'article not found']);
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Bild auslesen
+    if (isset( $_FILES['image_file'])) {
+        $image = $_files['image_file'];
+        // Bildgröße validieren
+        $errors['filename'] = $image['error'] === 1 ? 'The image is too large ' : '';
+        // Wenn ein Bild hochgeladen wurde, dann wird es validiert
+        if ( $tmp_path && $image['error'] === UPLOAD_ERR_OK) {
+            // Alt-Text wird gesetzt
+            $article['alttext'] = filter_input( INPUT_POST, 'image_alt');
+            // Alt-TExt validieren
+            $errors['alttext'] = is_text ($article['alttext'], 1, 254) ?'': 'Alt text must be between 1 and 254 characters';
+            // bildtyp wird validiert
+            $typ = mime_content_type( $tmp_path);
+            $errors['filename'] .= in_array( $typ, $allowed_types) ? '' : 'The file type is not allowed';
+            // Bildendung wird validiert
+            $extension = pathinfo( strtolower( $image['name']), PATHINFO_EXTENSION);
+            $errors['filename'] .= in_array($extension, $allowed_ext) ? '' : 'The file extension is not allowed';
+            // Bildgröße wird validiert
+            $errors['filename'] .= $image['size'] > $max_size ? 'The image exceeds the maximum upload size' : '';
+            // Wenn es keine Fehler gibt, wird ein Speicerort für das Bild festgelegt
+            if ( $errors['filename'] === '' && $errors['alttext'] === '') {
+                $article['filename'] = $image['name'];
+                $save_to = get_file_path( $image['name'], $path_to_img);
+            }
+        }
+    }
+}
 //-------------------------------------------------------------------------
 
 // Wenn das Formular mit Daten abgeschickt wurde, dann werden die Daten validiert und gespeichert
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     // Die Daten werden aus dem Formular ausgelesen und validiert
     $article['title'] = filter_input(INPUT_POST, 'title');
     $article['summary'] = filter_input(INPUT_POST, 'summary');
