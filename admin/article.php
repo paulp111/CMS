@@ -36,8 +36,7 @@ $section = '';
 if ($id) {
     $sql = "SELECT id, title, summary, content, category_id, user_id, published, images_id FROM articles WHERE id = :id";
     $article = pdo_execute($pdo, $sql, ['id' => $id])->fetch(PDO::FETCH_ASSOC);
-    var_dump($articles);
-    exit;
+   
     // Wenn der Artikel nicht gefunden wird, wird der Benutzer zur Artikelliste umgeleitet und über einen Fehler informiert.
     if (!$article) {
         redirect('articles.php', ['error' => 'Article not found']);
