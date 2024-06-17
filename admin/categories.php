@@ -2,19 +2,28 @@
 require '../includes/functions.php';
 require '../includes/db-connect.php';
 
+$error = filter_input(INPUT_GET, 'error') ?? '';
+$success = filter_input(INPUT_GET, 'success') ?? '';
+
 $sql = "SELECT id, name, navigation FROM category";
 $categories = pdo_execute($pdo, $sql)->fetchAll(PDO::FETCH_ASSOC);
 $section = '';
 
 $navigation = [
-    ['name' => 'articles', 'id' => ''],
-    ['name' => 'categories', 'id' => '']
+    ['name' => 'articles', 'id' => 'articles'],
+    ['name' => 'categories', 'id' => 'categories']
 ];
 ?>
 
 <?php include '../includes/header-admin.php'; ?>
 <main class="container mx-auto flex justify-center flex-col items-center">
     <header class="p-10">
+        <?php if ($error): ?>
+            <p class="text-red-500 bg-red-200 p-5 rounded-md"><?php echo e($error) ?></p>
+        <?php endif ?>
+        <?php if ($success): ?>
+            <p class="text-green-500 bg-green-200 p-5 rounded-md"><?php echo e($success) ?></p>
+        <?php endif ?>
         <h1 class="text-4xl text-blue-500 mb-8">Categories</h1>
         <button class="text-white bg-blue-500 p-3 rounded-md hover:bg-pink-600">
             <a href="category.php">Add a new category</a>
