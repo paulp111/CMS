@@ -12,7 +12,7 @@ $section = '';
 
 ?>
 
-<?php include './includes/header.php'; ?>
+<?php include '../public/includes/header.php'; ?>
 <main class="flex flex-wrap p-8" id="content">
     <?php foreach ($articles as $article): ?>
         <article class="w-full p-4 flex justify-between flex-col sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6 mb-4">
@@ -30,4 +30,4 @@ $section = '';
         </article>
     <?php endforeach; ?>
 </main>
-<?php include './includes/footer.php'; ?>
+<?php include '../public/includes/footer.php'; ?>

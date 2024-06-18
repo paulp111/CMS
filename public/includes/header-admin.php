@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e( $title ?? '' ) ?></title>
     <meta name="description" content="<?= e( $description ?? '' ) ?>">
-    <link rel="stylesheet" type="text/css" href="../css/output.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/output.css">
 </head>
 <body>
 <header class="bg-white border-gray-200 dark:bg-gray-900 border-b-4">
